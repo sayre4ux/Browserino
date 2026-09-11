@@ -5,6 +5,7 @@
 
 import AppKit
 import Foundation
+import SwiftUI
 
 struct ChromiumProfile: Hashable {
     /// Directory name on disk, e.g. "Default" or "Profile 2". This is what
@@ -36,6 +37,82 @@ enum ChromiumProfileService {
 
     private static var cache: [URL: (modified: Date, profiles: [ChromiumProfile])] = [:]
     private static var avatarImages: [URL: NSImage] = [:]
+
+    /// macOS treats a browser's user data as private to that browser, so reading it
+    /// is refused until the user points at the folder themselves. The bookmark from
+    /// that choice is what carries the permission across launches.
+    @AppStorage("browserDataAccess") private static var bookmarks: [String: Data] = [:]
+
+    static func hasAccess(forAppAt app: URL) -> Bool {
+        guard let root = userDataDirectory(forAppAt: app) else {
+            return false
+        }
+
+        return bookmarks[root.path] != nil
+    }
+
+    @discardableResult
+    static func requestAccess(forAppAt app: URL) -> Bool {
+        guard let root = userDataDirectory(forAppAt: app) else {
+            return false
+        }
+
+        let browser = Bundle(url: app)?.appDisplayName ?? app.appDisplayName
+
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.directoryURL = root
+        panel.message = "Choose this folder so Browserino can list \(browser)'s profiles."
+        panel.prompt = "Grant Access"
+
+        guard panel.runModal() == .OK, let picked = panel.url else {
+            return false
+        }
+
+        guard let data = try? picked.bookmarkData(
+            options: .withSecurityScope,
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        ) else {
+            return false
+        }
+
+        bookmarks[root.path] = data
+        cache[app] = nil
+
+        return true
+    }
+
+    private static func withAccess<T>(to root: URL, _ body: () -> T?) -> T? {
+        guard let data = bookmarks[root.path] else {
+            // No grant yet. Still worth attempting: a browser whose data is not
+            // protected, or an app already holding wider access, reads fine.
+            return body()
+        }
+
+        var isStale = false
+
+        guard let url = try? URL(
+            resolvingBookmarkData: data,
+            options: .withSecurityScope,
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else {
+            return body()
+        }
+
+        let opened = url.startAccessingSecurityScopedResource()
+
+        defer {
+            if opened {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        return body()
+    }
 
     /// Avatars are read while laying out rows, so keep them off the disk path.
     static func avatarImage(_ url: URL) -> NSImage? {
@@ -108,6 +185,12 @@ enum ChromiumProfileService {
             return nil
         }
 
+        return withAccess(to: root) {
+            readProfiles(forAppAt: app, root: root)
+        }
+    }
+
+    private static func readProfiles(forAppAt app: URL, root: URL) -> [ChromiumProfile]? {
         let localState = root.appending(path: "Local State")
 
         guard let modified = try? FileManager.default.attributesOfItem(
@@ -137,10 +220,18 @@ enum ChromiumProfileService {
                 return nil
             }
 
+            let avatar = avatarURL(root: root, directory: directory, info: info)
+
+            // Read now, while the security scope is still open: the picture lives
+            // inside the browser's protected data directory too.
+            if let avatar {
+                _ = avatarImage(avatar)
+            }
+
             return ChromiumProfile(
                 directory: directory,
                 name: info.name ?? directory,
-                avatar: avatarURL(root: root, directory: directory, info: info)
+                avatar: avatar
             )
         }
 

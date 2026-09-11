@@ -22,6 +22,14 @@ struct BrowsersTab: View {
             set: { self.privateArgs[key] = $0 })
     }
 
+    /// Offer the grant only where it could actually help: a Chromium browser whose
+    /// profiles we have not been able to read yet.
+    private func needsProfileAccess(_ target: BrowserTarget) -> Bool {
+        target.profile == nil
+            && ChromiumProfileService.userDataDirectory(forAppAt: target.app) != nil
+            && ChromiumProfileService.profiles(forAppAt: target.app) == nil
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             List {
@@ -70,6 +78,18 @@ struct BrowsersTab: View {
                                 ShortcutButton(
                                     shortcutKey: browser.shortcutKey(bundleIdentifier: browserId)
                                 )
+                            }
+
+                            if needsProfileAccess(browser) {
+                                Button("Enable profiles") {
+                                    if ChromiumProfileService.requestAccess(forAppAt: browser.app) {
+                                        browsers = BrowserUtil.loadBrowsers(oldBrowsers: browsers)
+                                    }
+                                }
+                                .help("macOS keeps a browser's profiles private until you point at the folder once.")
+
+                                Spacer()
+                                    .frame(width: 8)
                             }
 
                             Spacer()
