@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct BrowsersTab: View {
-    @AppStorage("browsers") private var browsers: [URL] = []
-    @AppStorage("hiddenBrowsers") private var hiddenBrowsers: [URL] = []
+    @AppStorage("browsers") private var browsers: [BrowserTarget] = []
+    @AppStorage("hiddenBrowsers") private var hiddenBrowsers: [BrowserTarget] = []
     @AppStorage("privateArgs") private var privateArgs: [String: String] = [:]
 
     private func move(from source: IndexSet, to destination: Int) {
@@ -26,7 +26,7 @@ struct BrowsersTab: View {
         VStack(alignment: .leading) {
             List {
                 ForEach(Array(browsers.enumerated()), id: \.offset) { offset, browser in
-                    if let bundle = Bundle(url: browser) {
+                    if let bundle = Bundle(url: browser.app) {
                         HStack {
                             Text((offset + 1).formatted())
                                 .font(
@@ -34,14 +34,13 @@ struct BrowsersTab: View {
                                 )
                                 .frame(width: 30, alignment: .leading)
 
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: bundle.bundlePath))
-                                .resizable()
+                            BrowserTargetIcon(target: browser)
                                 .frame(width: 32, height: 32)
 
                             Spacer()
                                 .frame(width: 8)
 
-                            Text(bundle.appDisplayName)
+                            Text(browser.displayName)
                                 .font(
                                     .system(size: 14)
                                 )
@@ -50,19 +49,26 @@ struct BrowsersTab: View {
                                 .frame(width: 32)
 
                             if let browserId = bundle.bundleIdentifier {
-                                TextField(
-                                    "Private argument",
-                                    text: privateArg(for: browserId)
-                                )
-                                .font(
-                                    .system(size: 14).monospaced()
-                                )
+                                // Incognito is a property of the browser, not of one
+                                // profile, so it stays on the plain row and every
+                                // profile of that browser inherits it.
+                                if browser.profile == nil {
+                                    TextField(
+                                        "Private argument",
+                                        text: privateArg(for: browserId)
+                                    )
+                                    .font(
+                                        .system(size: 14).monospaced()
+                                    )
+                                } else {
+                                    Spacer()
+                                }
 
                                 Spacer()
                                     .frame(width: 32)
 
                                 ShortcutButton(
-                                    browserId: browserId
+                                    shortcutKey: browser.shortcutKey(bundleIdentifier: browserId)
                                 )
                             }
 
@@ -89,15 +95,16 @@ struct BrowsersTab: View {
             }
             .scrollContentBackground(.hidden)
             .onAppear {
-                if browsers.isEmpty {
-                    browsers = BrowserUtil.loadBrowsers(
-                        oldBrowsers: browsers
-                    )
-                }
+                // Safe to run every time: the merge keeps the user's order and is
+                // idempotent, so this picks up profiles added since the last visit
+                // without waiting for an explicit Rescan.
+                browsers = BrowserUtil.loadBrowsers(
+                    oldBrowsers: browsers
+                )
             }
 
             Text(
-                "Drag and drop to reorder. Press record to assign a shortcut. Click on eye to hide unwanted browsers from prompt"
+                "Drag and drop to reorder. Press record to assign a shortcut. Click on eye to hide unwanted browsers from prompt. Browsers with several profiles appear once per profile — use Rescan in General after adding one."
             )
             .font(.subheadline)
             .foregroundStyle(.primary.opacity(0.5))

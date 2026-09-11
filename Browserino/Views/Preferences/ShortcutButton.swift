@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ShortcutButton: View {
-    let browserId: String
+    let shortcutKey: String
     
     @AppStorage("shortcuts") private var shortcuts: [String: String] = [:]
     
@@ -32,12 +32,12 @@ struct ShortcutButton: View {
                     if let shortcut = shortcuts.first(where: { $0.value == key }) {
                         shortcuts[shortcut.key] = nil
                     }
-                    shortcuts[browserId] = key
+                    shortcuts[shortcutKey] = key
 
                     return .handled
                 }
         } else {
-            let recordedKey = shortcuts[browserId]
+            let recordedKey = shortcuts[shortcutKey]
             
             Button(action: {
                 isRecording = true

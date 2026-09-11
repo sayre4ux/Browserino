@@ -11,6 +11,11 @@ struct App: Codable, Hashable {
     var host: String
     var schemeOverride: String
     var app: URL
+    var profile: String?
+
+    var target: BrowserTarget {
+        BrowserTarget(app: app, profile: profile)
+    }
 }
 
 struct NewApp: View {
@@ -112,11 +117,15 @@ struct AppItem: View {
             Spacer()
 
 
-            Text(bundle?.appDisplayName ?? "\(app.app.appDisplayName) (not installed)")
+            Text(bundle == nil
+                 ? "\(app.app.appDisplayName) (not installed)"
+                 : app.target.displayName)
                 .font(
                     .system(size: 14)
                 )
-                .foregroundStyle(bundle == nil ? .secondary : .primary)
+                .foregroundStyle(
+                    bundle == nil || app.target.hasMissingProfile ? .secondary : .primary
+                )
 
 
             Spacer()
@@ -124,16 +133,15 @@ struct AppItem: View {
 
             if let browserId = bundle?.bundleIdentifier {
                 ShortcutButton(
-                    browserId: browserId
+                    shortcutKey: app.target.shortcutKey(bundleIdentifier: browserId)
                 )
             }
 
             Spacer()
                 .frame(width: 8)
 
-            if let bundle {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: bundle.bundlePath))
-                    .resizable()
+            if bundle != nil {
+                BrowserTargetIcon(target: app.target)
                     .frame(width: 32, height: 32)
             } else {
                 Image(systemName: "questionmark.app.dashed")

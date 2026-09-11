@@ -49,6 +49,8 @@ struct EditAppForm: View {
                     ) {
                         if case .success(let url) = $0 {
                             app.app = url
+                            // The previous app's profile directory means nothing here.
+                            app.profile = nil
                         }
                     }
                     
@@ -57,6 +59,8 @@ struct EditAppForm: View {
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
+
+                ProfilePicker(app: app.app, profile: $app.profile)
             }
             
             Spacer()

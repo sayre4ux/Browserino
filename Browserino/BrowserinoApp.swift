@@ -150,7 +150,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 if let regex, urlString.firstMatch(of: regex) != nil {
                     BrowserUtil.openURL(
                         processedUrls,
-                        app: rule.app,
+                        target: rule.target,
                         isIncognito: false
                     )
                     return

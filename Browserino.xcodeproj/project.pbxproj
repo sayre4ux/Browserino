@@ -35,6 +35,10 @@
 		989B17FD2C17400A0039441B /* EditAppForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989B17FC2C17400A0039441B /* EditAppForm.swift */; };
 		98F919362C12187500BDC10C /* Browserino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 98F919352C12187500BDC10C /* Browserino.icns */; };
 		B9CFBE192F0C6F3D00FC6D37 /* URLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFBE182F0C6F3D00FC6D37 /* URLExtensions.swift */; };
+		B9CFC0032F0C6F3D00FC6D37 /* ProfilePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFC1032F0C6F3D00FC6D37 /* ProfilePicker.swift */; };
+		B9CFC0022F0C6F3D00FC6D37 /* BrowserTargetIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFC1022F0C6F3D00FC6D37 /* BrowserTargetIcon.swift */; };
+		B9CFC0012F0C6F3D00FC6D37 /* ChromiumProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFC1012F0C6F3D00FC6D37 /* ChromiumProfile.swift */; };
+		B9CFC0002F0C6F3D00FC6D37 /* BrowserTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFC1002F0C6F3D00FC6D37 /* BrowserTarget.swift */; };
 		B9CFBE1A2F0C6F3D00FC6D37 /* Bundle+AppDisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CFBE1B2F0C6F3D00FC6D37 /* Bundle+AppDisplayName.swift */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +74,10 @@
 		989B17FC2C17400A0039441B /* EditAppForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAppForm.swift; sourceTree = "<group>"; };
 		98F919352C12187500BDC10C /* Browserino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Browserino.icns; sourceTree = "<group>"; };
 		B9CFBE182F0C6F3D00FC6D37 /* URLExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensions.swift; sourceTree = "<group>"; };
+		B9CFC1032F0C6F3D00FC6D37 /* ProfilePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePicker.swift; sourceTree = "<group>"; };
+		B9CFC1022F0C6F3D00FC6D37 /* BrowserTargetIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTargetIcon.swift; sourceTree = "<group>"; };
+		B9CFC1012F0C6F3D00FC6D37 /* ChromiumProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumProfile.swift; sourceTree = "<group>"; };
+		B9CFC1002F0C6F3D00FC6D37 /* BrowserTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTarget.swift; sourceTree = "<group>"; };
 		B9CFBE1B2F0C6F3D00FC6D37 /* Bundle+AppDisplayName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+AppDisplayName.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -131,6 +139,7 @@
 		9830F0B72C11B08B00D69C88 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B9CFC1022F0C6F3D00FC6D37 /* BrowserTargetIcon.swift */,
 				989B17F12C16FC420039441B /* Preferences */,
 				989B17F02C16FBDF0039441B /* Prompt */,
 				9830F0B82C11B09700D69C88 /* BlurredView.swift */,
@@ -162,6 +171,8 @@
 		986AC6262CECDD2500884C40 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B9CFC1012F0C6F3D00FC6D37 /* ChromiumProfile.swift */,
+				B9CFC1002F0C6F3D00FC6D37 /* BrowserTarget.swift */,
 				986DC8082CFE42EA00447DC7 /* Rule.swift */,
 				664FDF212CE4AA6B009766AA /* BrowserUtil.swift */,
 			);
@@ -180,6 +191,7 @@
 		989B17F12C16FC420039441B /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				B9CFC1032F0C6F3D00FC6D37 /* ProfilePicker.swift */,
 				986DC80B2CFE447200447DC7 /* EditRuleForm.swift */,
 				986DC8062CFE42E000447DC7 /* RulesTab.swift */,
 				989B17F42C16FC690039441B /* ShortcutButton.swift */,
@@ -270,6 +282,10 @@
 				9830F0A62C119A3000D69C88 /* BrowserinoApp.swift in Sources */,
 				9830F0C52C11DF2C00D69C88 /* BrowserinoWindow.swift in Sources */,
 				B9CFBE192F0C6F3D00FC6D37 /* URLExtensions.swift in Sources */,
+				B9CFC0032F0C6F3D00FC6D37 /* ProfilePicker.swift in Sources */,
+				B9CFC0022F0C6F3D00FC6D37 /* BrowserTargetIcon.swift in Sources */,
+				B9CFC0012F0C6F3D00FC6D37 /* ChromiumProfile.swift in Sources */,
+				B9CFC0002F0C6F3D00FC6D37 /* BrowserTarget.swift in Sources */,
 				B9CFBE1A2F0C6F3D00FC6D37 /* Bundle+AppDisplayName.swift in Sources */,
 				989B17FB2C1710D70039441B /* AppsTab.swift in Sources */,
 				986DC80C2CFE447600447DC7 /* EditRuleForm.swift in Sources */,

@@ -67,6 +67,7 @@ struct RuleForm: View {
     @State private var regex: String = ""
     @State private var testUrls: String = "https://github.com/AlexStrNik/Browserino\nhttps://x.com/alexstrnik"
     @State private var url: URL?
+    @State private var profile: String?
     
     private var compiledRegex: Regex<AnyRegexOutput>? {
         return try? Regex(regex).ignoresCase()
@@ -127,6 +128,8 @@ struct RuleForm: View {
                 ) {
                     if case .success(let url) = $0 {
                         self.url = url
+                        // The previous app's profile directory means nothing here.
+                        self.profile = nil
                     }
                 }
                 
@@ -137,6 +140,8 @@ struct RuleForm: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            ProfilePicker(app: url, profile: $profile)
             
             Spacer()
                 .frame(height: 32)
@@ -162,7 +167,8 @@ struct RuleForm: View {
                     onSave(
                         Rule(
                             regex: regex,
-                            app: url
+                            app: url,
+                            profile: profile
                         )
                     )
                 }) {
@@ -177,6 +183,7 @@ struct RuleForm: View {
         .onAppear {
             regex = rule?.regex ?? ""
             url = rule?.app
+            profile = rule?.profile
         }
     }
 }

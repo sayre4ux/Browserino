@@ -61,19 +61,22 @@ struct RuleItem: View {
             Spacer()
             
             
-            Text(bundle?.appDisplayName ?? "\(rule.app.appDisplayName) (not installed)")
+            Text(bundle == nil
+                 ? "\(rule.app.appDisplayName) (not installed)"
+                 : rule.target.displayName)
                 .font(
                     .system(size: 14)
                 )
-                .foregroundStyle(bundle == nil ? .secondary : .primary)
+                .foregroundStyle(
+                    bundle == nil || rule.target.hasMissingProfile ? .secondary : .primary
+                )
             
             
             Spacer()
                 .frame(width: 8)
             
-            if let bundle {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: bundle.bundlePath))
-                    .resizable()
+            if bundle != nil {
+                BrowserTargetIcon(target: rule.target)
                     .frame(width: 32, height: 32)
             } else {
                 Image(systemName: "questionmark.app.dashed")
