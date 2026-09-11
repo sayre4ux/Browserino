@@ -43,14 +43,6 @@ enum ChromiumProfileService {
     /// that choice is what carries the permission across launches.
     @AppStorage("browserDataAccess") private static var bookmarks: [String: Data] = [:]
 
-    static func hasAccess(forAppAt app: URL) -> Bool {
-        guard let root = userDataDirectory(forAppAt: app) else {
-            return false
-        }
-
-        return bookmarks[root.path] != nil
-    }
-
     @discardableResult
     static func requestAccess(forAppAt app: URL) -> Bool {
         guard let root = userDataDirectory(forAppAt: app) else {
