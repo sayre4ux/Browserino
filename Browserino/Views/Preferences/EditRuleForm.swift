@@ -62,8 +62,6 @@ struct RuleForm: View {
     var onSave: (Rule) -> Void
     var onDelete: () -> Void
 
-    @State private var openWithPresented = false
-    
     @State private var regex: String = ""
     @State private var testUrls: String = "https://github.com/AlexStrNik/Browserino\nhttps://x.com/alexstrnik"
     @State private var url: URL?
@@ -116,32 +114,9 @@ struct RuleForm: View {
                 .frame(height: 32)
             
             
-            LabeledContent("Application:") {
-                Button(action: {
-                    openWithPresented.toggle()
-                }) {
-                    Text("Open with")
-                }
-                .fileImporter(
-                    isPresented: $openWithPresented,
-                    allowedContentTypes: [.application]
-                ) {
-                    if case .success(let url) = $0 {
-                        self.url = url
-                        // The previous app's profile directory means nothing here.
-                        self.profile = nil
-                    }
-                }
-                
-                if let url {
-                    Text(Bundle(url: url)?.appDisplayName ?? "\(url.appDisplayName) (not installed)")
-                        .padding(.horizontal, 5)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
+            LabeledContent("Open in:") {
+                BrowserTargetPicker(app: $url, profile: $profile)
             }
-
-            ProfilePicker(app: url, profile: $profile)
             
             Spacer()
                 .frame(height: 32)
