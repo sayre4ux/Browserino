@@ -92,6 +92,10 @@ enum ChromiumProfileService {
             relativeTo: nil,
             bookmarkDataIsStale: &isStale
         ) else {
+            // The grant is no longer usable. Re-signing or moving the app
+            // invalidates its bookmarks. Drop it so the UI offers the grant again
+            // instead of failing silently for good.
+            bookmarks[root.path] = nil
             return body()
         }
 
@@ -103,7 +107,13 @@ enum ChromiumProfileService {
             }
         }
 
-        return body()
+        let result = body()
+
+        if result == nil, isStale || !opened {
+            bookmarks[root.path] = nil
+        }
+
+        return result
     }
 
     /// Avatars are read while laying out rows, so keep them off the disk path.
@@ -165,7 +175,19 @@ enum ChromiumProfileService {
             return nil
         }
 
-        return support.appending(path: relativePath)
+        let root = support.appending(path: relativePath)
+
+        // CrProductDirName is not proof of a Chromium browser: Electron-based apps
+        // ship it too (ChatGPT.app declares com.openai.codex). Only a directory
+        // holding a Local State file is a profile store. fileExists answers that
+        // without permission, where opening the file would be refused.
+        guard FileManager.default.fileExists(
+            atPath: root.appending(path: "Local State").path
+        ) else {
+            return nil
+        }
+
+        return root
     }
 
     /// nil means "could not determine" — either not a Chromium browser, or Local
